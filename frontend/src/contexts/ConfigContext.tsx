@@ -371,9 +371,16 @@ export function ConfigProvider({ children }: { children: ReactNode }) {
     'builtin-ai': [],
     'custom-openai': [],
     'nvidia-nim': [
-      'meta/llama-3.1-70b-instruct',
-      'meta/llama-3.1-8b-instruct',
-      'nvidia/nemotron-4-340b-instruct',
+      'mistralai/mistral-nemotron',
+      'mistralai/mistral-large-3-675b-instruct-2512',
+      'meta/llama-4-maverick-17b-128e-instruct',
+      'abacusai/dracarys-llama-3.1-70b-instruct',
+      'stepfun-ai/step-3.5-flash',
+      'bytedance/seed-oss-36b-instruct',
+      'minimaxai/minimax-m2.7',
+      'nvidia/nemotron-mini-4b-instruct',
+      'google/gemma-3n-e4b-it',
+      'google/gemma-2-2b-it',
     ],
   };
 
