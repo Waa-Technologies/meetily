@@ -370,6 +370,11 @@ export function ConfigProvider({ children }: { children: ReactNode }) {
     openai: ['gpt-4', 'gpt-4-turbo', 'gpt-3.5-turbo'],
     'builtin-ai': [],
     'custom-openai': [],
+    'nvidia-nim': [
+      'meta/llama-3.1-70b-instruct',
+      'meta/llama-3.1-8b-instruct',
+      'nvidia/nemotron-4-340b-instruct',
+    ],
   };
 
   // Toggle confidence indicator with localStorage persistence
