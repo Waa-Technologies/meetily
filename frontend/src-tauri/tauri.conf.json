@@ -110,5 +110,9 @@
             "signCommand": "powershell -ExecutionPolicy Bypass -File scripts/sign-windows.ps1 -FilePath %1"
         }
     },
-    "plugins": {}
+    "plugins": {
+        "updater": {
+            "endpoints": []
+        }
+    }
 }
