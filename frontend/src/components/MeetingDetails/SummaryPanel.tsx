@@ -237,12 +237,12 @@ export function SummaryPanel({
               {summaryResponse.raw_summary ? (
                 <div className="mt-4">
                   <h4 className="font-medium mb-1">Full Summary</h4>
-                  <p className="text-sm whitespace-pre-wrap">{summaryResponse.raw_summary}</p>
+                  <p className="text-sm whitespace-pre-wrap" dir="auto">{summaryResponse.raw_summary}</p>
                 </div>
               ) : null}
             </div>
           )}
-          <div className="p-6 w-full">
+          <div className="p-6 w-full" dir="auto">
             <BlockNoteSummaryView
               ref={summaryRef}
               summaryData={aiSummary}

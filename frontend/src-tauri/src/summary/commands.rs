@@ -217,6 +217,7 @@ pub async fn api_process_transcript<R: Runtime>(
 
     // Spawn background task for actual processing
     let meeting_id_clone = m_id.clone();
+    let language = crate::get_language_preference_internal();
     tauri::async_runtime::spawn(async move {
         SummaryService::process_transcript_background(
             app,
@@ -227,6 +228,7 @@ pub async fn api_process_transcript<R: Runtime>(
             model_name,
             final_prompt,
             final_template_id,
+            language,
         )
         .await;
     });

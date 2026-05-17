@@ -153,6 +153,7 @@ pub fn extract_meeting_name_from_markdown(markdown: &str) -> Option<String> {
 /// * `top_p` - Optional top_p (CustomOpenAI provider)
 /// * `app_data_dir` - Optional app data directory (BuiltInAI provider)
 /// * `cancellation_token` - Optional cancellation token to stop processing
+/// * `language` - Optional language code (e.g., "he", "en") for output language
 ///
 /// # Returns
 /// Tuple of (final_summary_markdown, number_of_chunks_processed)
@@ -172,6 +173,7 @@ pub async fn generate_meeting_summary(
     top_p: Option<f32>,
     app_data_dir: Option<&PathBuf>,
     cancellation_token: Option<&CancellationToken>,
+    language: Option<&str>,
 ) -> Result<(String, i64), String> {
     // Check cancellation at the start
     if let Some(token) = cancellation_token {
@@ -212,7 +214,15 @@ pub async fn generate_meeting_summary(
         info!("Split transcript into {} chunks", num_chunks);
 
         let mut chunk_summaries = Vec::new();
-        let system_prompt_chunk = "You are an expert meeting summarizer.";
+        let language_name = language
+            .map(|l| crate::language_code_to_name(l))
+            .unwrap_or("the same language as the transcript");
+
+        let system_prompt_chunk = if language.is_some() && language != Some("en") && language != Some("auto-translate") {
+            format!("You are an expert meeting summarizer. You MUST produce your entire output in {}.", language_name)
+        } else {
+            "You are an expert meeting summarizer.".to_string()
+        };
         let user_prompt_template_chunk = "Provide a concise but comprehensive summary of the following transcript chunk. Capture all key points, decisions, action items, and mentioned individuals.\n\n<transcript_chunk>\n{}\n</transcript_chunk>";
 
         for (i, chunk) in chunks.iter().enumerate() {
@@ -232,7 +242,7 @@ pub async fn generate_meeting_summary(
                 provider,
                 model_name,
                 api_key,
-                system_prompt_chunk,
+                &system_prompt_chunk,
                 &user_prompt_chunk,
                 ollama_endpoint,
                 custom_openai_endpoint,
@@ -278,7 +288,12 @@ pub async fn generate_meeting_summary(
                 chunk_summaries.len()
             );
             let combined_text = chunk_summaries.join("\n---\n");
-            let system_prompt_combine = "You are an expert at synthesizing meeting summaries.";
+            let system_prompt_combine = if language.is_some() && language != Some("en") && language != Some("auto-translate") {
+                let lang = language.map(|l| crate::language_code_to_name(l)).unwrap_or("the same language as the transcript");
+                format!("You are an expert at synthesizing meeting summaries. You MUST produce your entire output in {}.", lang)
+            } else {
+                "You are an expert at synthesizing meeting summaries.".to_string()
+            };
             let user_prompt_combine_template = "The following are consecutive summaries of a meeting. Combine them into a single, coherent, and detailed narrative summary that retains all important details, organized logically.\n\n<summaries>\n{}\n</summaries>";
 
             let user_prompt_combine = user_prompt_combine_template.replace("{}", &combined_text);
@@ -287,7 +302,7 @@ pub async fn generate_meeting_summary(
                 provider,
                 model_name,
                 api_key,
-                system_prompt_combine,
+                &system_prompt_combine,
                 &user_prompt_combine,
                 ollama_endpoint,
                 custom_openai_endpoint,
@@ -313,6 +328,21 @@ pub async fn generate_meeting_summary(
     let clean_template_markdown = template.to_markdown_structure();
     let section_instructions = template.to_section_instructions();
 
+    // Build language instruction for the final prompt
+    let language_instruction = match language {
+        Some(lang) if lang != "en" && lang != "auto-translate" => {
+            let lang_name = crate::language_code_to_name(lang);
+            format!(
+                r#"
+**LANGUAGE INSTRUCTION:**
+The transcript is in {lang_name}. You MUST generate the ENTIRE summary report in {lang_name}.
+All section headings, bullet points, and content MUST be in {lang_name}. Do NOT translate to English.
+"#
+            )
+        }
+        _ => String::new(),
+    };
+
     let final_system_prompt = format!(
         r#"You are an expert meeting summarizer. Generate a final meeting report by filling in the provided Markdown template based on the source text.
 
@@ -323,7 +353,7 @@ pub async fn generate_meeting_summary(
 4. If a section has no relevant info, write "None noted in this section."
 5. Output **only** the completed Markdown report.
 6. If unsure about something, omit it.
-
+{}
 **SECTION-SPECIFIC INSTRUCTIONS:**
 {}
 
@@ -331,7 +361,7 @@ pub async fn generate_meeting_summary(
 {}
 </template>
 "#,
-        section_instructions, clean_template_markdown
+        language_instruction, section_instructions, clean_template_markdown
     );
 
     let mut final_user_prompt = format!(

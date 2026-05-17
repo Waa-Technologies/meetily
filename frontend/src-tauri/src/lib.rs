@@ -387,6 +387,44 @@ pub fn get_language_preference_internal() -> Option<String> {
     LANGUAGE_PREFERENCE.lock().ok().map(|lang| lang.clone())
 }
 
+/// Returns the human-readable name for a Whisper language code.
+/// Used by the summary pipeline to instruct the LLM which language to produce.
+pub fn language_code_to_name(code: &str) -> &str {
+    match code {
+        "auto" | "auto-translate" => "the same language as the transcript",
+        "en" => "English",
+        "he" => "Hebrew",
+        "ar" => "Arabic",
+        "zh" => "Chinese",
+        "de" => "German",
+        "es" => "Spanish",
+        "ru" => "Russian",
+        "ko" => "Korean",
+        "fr" => "French",
+        "ja" => "Japanese",
+        "pt" => "Portuguese",
+        "tr" => "Turkish",
+        "pl" => "Polish",
+        "nl" => "Dutch",
+        "sv" => "Swedish",
+        "it" => "Italian",
+        "hi" => "Hindi",
+        "vi" => "Vietnamese",
+        "uk" => "Ukrainian",
+        "el" => "Greek",
+        "cs" => "Czech",
+        "ro" => "Romanian",
+        "da" => "Danish",
+        "hu" => "Hungarian",
+        "no" => "Norwegian",
+        "th" => "Thai",
+        "fa" => "Persian",
+        "id" => "Indonesian",
+        "fi" => "Finnish",
+        _ => "the same language as the transcript",
+    }
+}
+
 pub fn run() {
     log::set_max_level(log::LevelFilter::Info);
 

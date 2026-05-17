@@ -77,7 +77,8 @@ class SchemaValidator:
                 ('groqApiKey', 'TEXT', ''),
                 ('openaiApiKey', 'TEXT', ''),
                 ('anthropicApiKey', 'TEXT', ''),
-                ('ollamaApiKey', 'TEXT', '')
+                ('ollamaApiKey', 'TEXT', ''),
+                ('nvidiaApiKey', 'TEXT', '')
             ],
             'transcript_settings': [
                 ('id', 'TEXT', 'PRIMARY KEY'),

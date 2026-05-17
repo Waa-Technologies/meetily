@@ -84,7 +84,7 @@ class TranscriptProcessor:
         logger.info("TranscriptProcessor initialized.")
         self.db = DatabaseManager()
         self.active_clients = []  # Track active Ollama client sessions
-    async def process_transcript(self, text: str, model: str, model_name: str, chunk_size: int = 5000, overlap: int = 1000, custom_prompt: str = "") -> Tuple[int, List[str]]:
+    async def process_transcript(self, text: str, model: str, model_name: str, chunk_size: int = 5000, overlap: int = 1000, custom_prompt: str = "", language: str = None) -> Tuple[int, List[str]]:
         """
         Process transcript text into chunks and generate structured summaries for each chunk using an AI model.
 
@@ -142,6 +142,14 @@ class TranscriptProcessor:
                 llm = OpenAIModel(model_name, provider=OpenAIProvider(api_key=api_key))
                 logger.info(f"Using OpenAI model: {model_name}")
             # --- END OPENAI SUPPORT ---
+            elif model == "nvidia":
+                api_key = await db.get_api_key("nvidia")
+                if not api_key: raise ValueError("NVIDIA_API_KEY not set. Get one from build.nvidia.com")
+                llm = OpenAIModel(model_name, provider=OpenAIProvider(
+                    base_url="https://integrate.api.nvidia.com/v1",
+                    api_key=api_key
+                ))
+                logger.info(f"Using NVIDIA NIM model: {model_name}")
             else:
                 logger.error(f"Unsupported model provider requested: {model}")
                 raise ValueError(f"Unsupported model provider: {model}")
@@ -165,6 +173,18 @@ class TranscriptProcessor:
             num_chunks = len(chunks)
             logger.info(f"Split transcript into {num_chunks} chunks.")
 
+            # Build language instruction for non-English transcripts
+            language_instruction = ""
+            if language and language not in ("en", "auto-translate"):
+                language_names = {
+                    "he": "Hebrew", "ar": "Arabic", "zh": "Chinese", "de": "German",
+                    "es": "Spanish", "ru": "Russian", "ko": "Korean", "fr": "French",
+                    "ja": "Japanese", "pt": "Portuguese", "tr": "Turkish", "pl": "Polish",
+                    "nl": "Dutch", "sv": "Swedish", "it": "Italian", "hi": "Hindi",
+                }
+                lang_name = language_names.get(language, language)
+                language_instruction = f"\n\nIMPORTANT LANGUAGE INSTRUCTION: The transcript is in {lang_name}. Generate ALL content (section titles, bullet points, text) in {lang_name}. Do NOT translate to English.\n"
+
             for i, chunk in enumerate(chunks):
                 logger.info(f"Processing chunk {i+1}/{num_chunks}...")
                 try:
@@ -180,7 +200,7 @@ class TranscriptProcessor:
                             - Use 'heading2' for subheadings
                             
                             For the color field, use 'gray' for less important content or '' (empty string) for default.
-
+                            {language_instruction}
                             Transcript Chunk:
                             ---
                         {chunk}

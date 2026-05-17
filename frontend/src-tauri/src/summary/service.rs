@@ -81,6 +81,7 @@ impl SummaryService {
         model_name: String,
         custom_prompt: String,
         template_id: String,
+        language: Option<String>,
     ) {
         let start_time = Instant::now();
         info!(
@@ -237,6 +238,7 @@ impl SummaryService {
             custom_openai_top_p,
             app_data_dir.as_ref(),
             Some(&cancellation_token),
+            language.as_deref(),
         )
         .await;
 

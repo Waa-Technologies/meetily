@@ -106,6 +106,7 @@ class TranscriptRequest(BaseModel):
     chunk_size: Optional[int] = 5000
     overlap: Optional[int] = 1000
     custom_prompt: Optional[str] = "Generate a summary of the meeting transcript."
+    language: Optional[str] = None
 
 class SummaryProcessor:
     """Handles the processing of summaries in a thread-safe way"""
@@ -238,7 +239,8 @@ async def process_transcript_background(process_id: str, transcript: TranscriptR
             model_name=transcript.model_name,
             chunk_size=transcript.chunk_size,
             overlap=transcript.overlap,
-            custom_prompt=custom_prompt
+            custom_prompt=custom_prompt,
+            language=transcript.language
         )
 
         # Create final summary structure by aggregating chunk results

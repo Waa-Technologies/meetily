@@ -227,6 +227,13 @@ export function LanguageSelection({
               Transcription will be optimized for <strong>{selectedLanguageName}</strong>
             </p>
           )}
+          {/* Model recommendation for non-Latin languages like Hebrew, Arabic */}
+          {['he', 'ar', 'zh', 'ja', 'ko', 'hi', 'th', 'ur', 'fa', 'ta', 'te', 'bn', 'ka', 'hy', 'my', 'km'].includes(selectedLanguage) && (
+            <div className="p-2 bg-purple-50 border border-purple-200 rounded text-purple-800">
+              <p className="font-medium">Model Recommendation</p>
+              <p className="mt-1">For best <strong>{selectedLanguageName}</strong> transcription quality, use the <strong>large-v3-turbo</strong> or <strong>large-v3</strong> Whisper model. Smaller models (tiny, base) may produce poor results for this language.</p>
+            </div>
+          )}
         </div>
       </div>
     </div>

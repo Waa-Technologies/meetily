@@ -92,6 +92,10 @@ pub struct Setting {
     #[sqlx(rename = "ollamaEndpoint")]
     #[serde(rename = "ollamaEndpoint")]
     pub ollama_endpoint: Option<String>,
+    /// NVIDIA NIM API key
+    #[sqlx(rename = "nvidiaApiKey")]
+    #[serde(rename = "nvidiaApiKey")]
+    pub nvidia_api_key: Option<String>,
     /// Custom OpenAI-compatible endpoint configuration stored as JSON
     #[sqlx(rename = "customOpenAIConfig")]
     #[serde(rename = "customOpenAIConfig")]
