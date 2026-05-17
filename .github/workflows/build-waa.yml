@@ -103,13 +103,10 @@ jobs:
           key: ${{ runner.os }}-ffmpeg-${{ hashFiles('frontend/src-tauri/build.rs', 'frontend/src-tauri/build/ffmpeg.rs') }}
 
       - name: Build Tauri app (unsigned)
-        uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          projectPath: frontend
-          includeUpdaterJson: false
-          args: --target aarch64-apple-darwin ${{ steps.build-profile.outputs.args }}
+        working-directory: frontend
+        run: pnpm tauri build --target aarch64-apple-darwin ${{ steps.build-profile.outputs.args }}
 
       - name: Upload DMG
         uses: actions/upload-artifact@v4
