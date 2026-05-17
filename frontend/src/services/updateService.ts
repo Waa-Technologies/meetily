@@ -5,9 +5,22 @@
  * Provides update checking, downloading, and installation functionality.
  */
 
-import { check, Update } from '@tauri-apps/plugin-updater';
 import { relaunch } from '@tauri-apps/plugin-process';
 import { getVersion } from '@tauri-apps/api/app';
+
+type Update = {
+  available: boolean;
+  version?: string;
+  date?: string;
+  body?: string;
+  download: () => Promise<void>;
+  install: () => Promise<void>;
+};
+
+async function check(): Promise<Update | null> {
+  console.warn('Updater plugin is not available in this build');
+  return null;
+}
 
 export interface UpdateInfo {
   available: boolean;

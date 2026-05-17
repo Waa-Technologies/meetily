@@ -10,9 +10,21 @@ import {
 } from './ui/dialog';
 import { Button } from './ui/button';
 import { updateService, UpdateInfo, UpdateProgress } from '@/services/updateService';
-import { check, Update } from '@tauri-apps/plugin-updater';
 import { relaunch } from '@tauri-apps/plugin-process';
 import { toast } from 'sonner';
+
+type Update = {
+  available: boolean;
+  version?: string;
+  date?: string;
+  body?: string;
+  downloadAndInstall: (cb: (event: any) => void) => Promise<void>;
+};
+
+async function check(): Promise<Update | null> {
+  console.warn('Updater plugin is not available in this build');
+  return null;
+}
 
 interface UpdateDialogProps {
   open: boolean;
