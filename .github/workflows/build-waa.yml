@@ -108,6 +108,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           projectPath: frontend
+          includeUpdaterJson: false
           args: --target aarch64-apple-darwin ${{ steps.build-profile.outputs.args }}
 
       - name: Upload DMG
