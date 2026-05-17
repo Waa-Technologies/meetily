@@ -63,7 +63,6 @@
                         "store:default",
                         "notification:default",
                         "notification:allow-is-permission-granted",
-                        "updater:default",
                         "process:default",
                         {
                             "identifier": "fs:scope",
@@ -110,9 +109,5 @@
             "signCommand": "powershell -ExecutionPolicy Bypass -File scripts/sign-windows.ps1 -FilePath %1"
         }
     },
-    "plugins": {
-        "updater": {
-            "endpoints": []
-        }
-    }
+    "plugins": {}
 }
